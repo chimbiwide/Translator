@@ -1,0 +1,27 @@
+Screen {
+
+}
+
+DirectoryTree {
+    max-height: 50%;
+}
+
+Select {
+    align: center middle;
+    margin: 2;
+}
+
+Bottom_Panel {
+    align: center bottom;
+    dock: bottom;
+    height: auto;
+}
+
+#translate {
+    width: 50%;
+    margin: 1;
+}
+
+.started #translate {
+    visibility: hidden;
+}
