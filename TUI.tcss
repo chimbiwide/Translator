@@ -17,11 +17,13 @@ Bottom_Panel {
     height: auto;
 }
 
+#translate_progress {
+    width: 50%;
+    margin: 1;
+    align: center middle
+}
+
 #translate {
     width: 50%;
     margin: 1;
-}
-
-.started #translate {
-    visibility: hidden;
 }

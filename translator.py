@@ -2,17 +2,20 @@ import lmstudio as lms
 import subprocess
 
 def clean_file(path: str):
+    """removes all empty lines in the file"""
     with open(path, 'r', encoding='utf-8') as f:
         lines = [line for line in f if line.strip()]
     with open (path, "w", encoding='utf-8') as f:
         f.writelines(lines)
 
 def read_file(path:str) -> str:
+    """Read the file from the give file path"""
     with open(path, 'r', encoding='utf-8') as f:
         text = f.read()
     return text
 
 def parse_file(text:str, max_chars:int=2000) -> list:
+    """parses the given file based on the "max_chars", defaults to 2000 characters"""
     if len(text) <= max_chars:
         return [text]
     lines = text.splitlines(keepends=True)
@@ -30,14 +33,16 @@ def parse_file(text:str, max_chars:int=2000) -> list:
 
     return chunks
 
-def downloaded_models():
-            downloaded = lms.list_downloaded_models("llm")
-            model_key = []
-            for model in downloaded:
-                model_key.append(model.model_key)
-            return model_key
+def downloaded_models() -> list:
+    """lists the downloaded mdoel in lm studio"""
+    downloaded = lms.list_downloaded_models("llm")
+    model_key = []
+    for model in downloaded:
+        model_key.append(model.model_key)
+    return model_key
 
 def start_server():
+    """uses the lmstudio CLI to start the lmstudio server"""
     result = subprocess.run(["lms","server","start"], capture_output=True, text=True)
     print(result.stderr)
 
@@ -68,12 +73,16 @@ def unload_model(model:str):
 def target_language():
     return ["English", "Chinese", "French", "Spanish", "Japanese", "Arabic", "German"]
 
-def translate(file:list, target_lang: str, model:str, temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0) -> str:
+def translate(file:list, target_lang: str, model:str, temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
     translated_text = ""
+    total_segments = len(file)
     for i, text in enumerate(file):
         print(f"Translating segment {i+1}")
         translated_text += llmInstance(text, target_lang, model, temp, top_k, top_p, rep_penalty)
         print(f"Translated segment {i+1}\n\n")
+
+        if progress_callback:
+            progress_callback(i+1, total_segments)
     return translated_text
 
 def write_file(text:str, output_path:str="./translated_file.txt"):
@@ -87,11 +96,11 @@ def main():
     translated = translate(text, "zh", "huihui-ai.huihui-hunyuan-mt-7b-abliterated", 0.7, 20, 0.6, 1.05)
     write_file(translated)
 
-def translate_pipeline(path:str, model:str, target_lang:str,temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0) -> str:
+def translate_pipeline(path:str, model:str, target_lang:str,temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
     clean_file(path)
     file = read_file(path)
     text = parse_file(file)
-    translated = translate(text, target_lang, model, 0.7, 20, 0.6, 1.05)
+    translated = translate(text, target_lang, model, temp, top_k, top_p, rep_penalty, progress_callback)
     write_file(translated)
 
 if __name__ == "__main__":
