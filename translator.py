@@ -51,12 +51,17 @@ def stop_server():
     result = subprocess.run(["lms","server","stop"], capture_output=True, text=True)
     print(result.stderr)
 
+def unload_model():
+    """yses the LM-Studio CLI to unload all models"""
+    result = subprocess.run(["lms","unload","--all"],capture_output=True,text=True)
+    print(result.stderr)
+
 def llmInstance(text:str, target_lang: str, model:str, temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0) -> str:
     """Defines the parameters and translates the given segment"""
     model = lms.llm(model,config={
         "contextLength": 10240,
         "gpu": {
-            "ratio": 0.5,
+            "ratio": 1.0,
         }
     })
     prompt = f"Translate the following segment into {target_lang}, without additional explanation.\n\n" + text
@@ -67,11 +72,6 @@ def llmInstance(text:str, target_lang: str, model:str, temp:float=1.0, top_k:int
         "topPSampling": top_p
     })
     return translated_txt.content
-
-def unload_model(model:str):
-    """unloads the model"""
-    model = lms.llm(model)
-    model.unload()
 
 def target_language():
     """returns the list of supported languages"""

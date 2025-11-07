@@ -6,7 +6,7 @@ from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, DirectoryTree, Select, Button, ProgressBar, Label
 from textual.containers import HorizontalGroup,VerticalScroll
 
-from translator import downloaded_models, start_server, stop_server, target_language, translate_pipeline, process_file_pipeline
+from translator import downloaded_models, start_server, stop_server, target_language, translate_pipeline, process_file_pipeline, unload_model
 
 class FolderTree(DirectoryTree):
     def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
@@ -132,4 +132,5 @@ if __name__ == "__main__":
     start_server()
     app = TUI()
     app.run()
+    unload_model()
     stop_server()
