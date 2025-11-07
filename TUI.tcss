@@ -3,7 +3,7 @@ Screen {
 }
 
 DirectoryTree {
-    max-height: 30%;
+    max-height: 40%;
 }
 
 Select {
