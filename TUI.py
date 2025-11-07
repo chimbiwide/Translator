@@ -19,7 +19,7 @@ class Config(HorizontalGroup):
 
 class Bottom_Panel(VerticalScroll):
     def compose(self) -> ComposeResult:
-        yield ProgressBar(show_eta=False,show_bar=False, show_percentage=False,id="translate_progress")
+        yield ProgressBar(show_eta=False,show_bar=True, show_percentage=True,id="translate_progress")
         yield Button("Translate", id="translate", variant="success")
 
 class TUI(App):
@@ -69,11 +69,6 @@ class TUI(App):
 
     @work(exclusive=True, thread=True)
     def do_translation(self) -> None:
-        progress_bar = self.query_one("#translate_progress", ProgressBar)
-        progress_bar.show_bar = True
-        progress_bar.show_percentage = True
-        progress_bar.progress = 0
-
         translate_pipeline(
             self.file_path,
             self.selected_model,
@@ -88,18 +83,23 @@ class TUI(App):
         select_lang = self.query_one("#language_select", Select)
         select_model = self.query_one("#model_select", Select)
         translate_button = self.query_one("#translate", Button)
+        progress_bar = self.query_one("#translate_progress", ProgressBar)
 
         if translating:
             folder_tree.disabled = True
             select_lang.disabled = True
             select_model.disabled = True
+            progress_bar.visible = True
 
             translate_button.label = "Translating..."
             translate_button.disabled = True
+
+            progress_bar.progress = 0
         else:
             folder_tree.disabled = False
             select_lang.disabled = False
             select_model.disabled = False
+            progress_bar.visible = False
 
             translate_button.label = "Translate"
             translate_button.disabled = False
@@ -113,14 +113,13 @@ class TUI(App):
 
         progress_bar = self.query_one("#translate_progress", ProgressBar)
         progress_bar.progress = 0
-        progress_bar.show_bar = False
-        progress_bar.show_percentage = False
 
         self.sub_title = "Translation Complete!"
         self.set_timer(5, self.clear_subtitles)
 
     def clear_subtitles(self) -> None:
         self.sub_title = ""
+
 if __name__ == "__main__":
     start_server()
     app = TUI()

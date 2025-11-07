@@ -34,7 +34,7 @@ def parse_file(text:str, max_chars:int=2000) -> list:
     return chunks
 
 def downloaded_models() -> list:
-    """lists the downloaded mdoel in lm studio"""
+    """lists the downloaded model in LM Studio"""
     downloaded = lms.list_downloaded_models("llm")
     model_key = []
     for model in downloaded:
@@ -42,15 +42,17 @@ def downloaded_models() -> list:
     return model_key
 
 def start_server():
-    """uses the lmstudio CLI to start the lmstudio server"""
+    """uses the LM-Studio CLI to start the LM-Studio server"""
     result = subprocess.run(["lms","server","start"], capture_output=True, text=True)
     print(result.stderr)
 
 def stop_server():
+    """uses the LM-Studio CLI to stop the LM-Studio server"""
     result = subprocess.run(["lms","server","stop"], capture_output=True, text=True)
     print(result.stderr)
 
 def llmInstance(text:str, target_lang: str, model:str, temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0) -> str:
+    """Defines the parameters and translates the given segment"""
     model = lms.llm(model,config={
         "contextLength": 10240,
         "gpu": {
@@ -67,13 +69,16 @@ def llmInstance(text:str, target_lang: str, model:str, temp:float=1.0, top_k:int
     return translated_txt.content
 
 def unload_model(model:str):
+    """unloads the model"""
     model = lms.llm(model)
     model.unload()
 
 def target_language():
+    """returns the list of supported languages"""
     return ["English", "Chinese", "French", "Spanish", "Japanese", "Arabic", "German"]
 
 def translate(file:list, target_lang: str, model:str, temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
+    """the main translate function that translates the entire file"""
     translated_text = ""
     total_segments = len(file)
     for i, text in enumerate(file):
@@ -86,6 +91,7 @@ def translate(file:list, target_lang: str, model:str, temp:float=1.0, top_k:int=
     return translated_text
 
 def write_file(text:str, output_path:str="./translated_file.txt"):
+    """write the translated file into a file"""
     with open(output_path, 'w', encoding='utf-8') as f:
         f.writelines(text)
 
@@ -97,6 +103,7 @@ def main():
     write_file(translated)
 
 def translate_pipeline(path:str, model:str, target_lang:str,temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
+    """pipeline for translation"""
     clean_file(path)
     file = read_file(path)
     text = parse_file(file)
