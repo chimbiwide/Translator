@@ -4,9 +4,9 @@ from typing import Iterable
 from textual import on, work
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, DirectoryTree, Select, Button, ProgressBar, Label
-from textual.containers import HorizontalGroup, CenterMiddle, Center, VerticalScroll
+from textual.containers import HorizontalGroup,VerticalScroll
 
-from translator import downloaded_models, start_server, stop_server, target_language, translate_pipeline
+from translator import downloaded_models, start_server, stop_server, target_language, translate_pipeline, process_file_pipeline
 
 class FolderTree(DirectoryTree):
     def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
@@ -69,8 +69,12 @@ class TUI(App):
 
     @work(exclusive=True, thread=True)
     def do_translation(self) -> None:
+        segments = process_file_pipeline(self.file_path)
+        segment_length = len(segments)
+
+        self.call_from_thread(self.init_progress, segment_length)
         translate_pipeline(
-            self.file_path,
+            segments,
             self.selected_model,
             self.selected_language,
             0.7, 20, 0.6, 1.05,
@@ -104,9 +108,13 @@ class TUI(App):
             translate_button.label = "Translate"
             translate_button.disabled = False
 
-    def update_progress(self, current: int, total: int) -> None:
+    def update_progress(self, current: int, total:int) -> None:
         progress_bar = self.query_one("#translate_progress", ProgressBar)
-        progress_bar.update(total=total, progress=current)
+        progress_bar.update(progress=current)
+
+    def init_progress(self, total: int) -> None:
+        progress_bar = self.query_one("#translate_progress", ProgressBar)
+        progress_bar.update(total=total, progress=0)
 
     def on_translation_complete(self) -> None:
         self.set_translate_state(False)

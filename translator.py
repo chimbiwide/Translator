@@ -96,17 +96,23 @@ def write_file(text:str, output_path:str="./translated_file.txt"):
         f.writelines(text)
 
 def main():
+    """purely for testing proposes"""
     clean_file("message.txt")
     file = read_file("message.txt")
     text = parse_file(file)
     translated = translate(text, "zh", "huihui-ai.huihui-hunyuan-mt-7b-abliterated", 0.7, 20, 0.6, 1.05)
     write_file(translated)
 
-def translate_pipeline(path:str, model:str, target_lang:str,temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
-    """pipeline for translation"""
+def process_file_pipeline(path:str) -> list:
+    """pipeline for file processing"""
     clean_file(path)
     file = read_file(path)
     text = parse_file(file)
+    return text
+
+def translate_pipeline(file:list, model:str, target_lang:str,temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
+    """pipeline for translation"""
+    text = file
     translated = translate(text, target_lang, model, temp, top_k, top_p, rep_penalty, progress_callback)
     write_file(translated)
 
