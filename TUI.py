@@ -9,17 +9,22 @@ from textual.containers import HorizontalGroup,VerticalScroll
 from translator import downloaded_models, start_server, stop_server, target_language, translate_pipeline, process_file_pipeline, unload_model
 
 class FolderTree(DirectoryTree):
+    #folder tree to show the txt files in the directory
     def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
         return [path for path in paths if path.name.endswith(".txt")]
 
 class Config(HorizontalGroup):
     def compose(self) -> ComposeResult:
+        #select model from the downloaded models
         yield Select.from_values(downloaded_models(), prompt="Select Desired Model", id="model_select")
+        #seleect target language
         yield Select.from_values(target_language(), prompt="Select target language", id="language_select")
 
 class Bottom_Panel(VerticalScroll):
     def compose(self) -> ComposeResult:
+        #progress bar to show steps for translations
         yield ProgressBar(show_eta=False,show_bar=True, show_percentage=True,id="translate_progress")
+        #button for translating
         yield Button("Translate", id="translate", variant="success")
 
 class TUI(App):
@@ -31,6 +36,7 @@ class TUI(App):
     file_name = ""
 
     def compose(self) -> ComposeResult:
+        #folder at the very top, then the select, then the progressbar&button
         yield Header()
         yield Footer()
         yield FolderTree("./", id="target_file")
@@ -69,6 +75,8 @@ class TUI(App):
 
     @work(exclusive=True, thread=True)
     def do_translation(self) -> None:
+        #when the translation button is pressed, start a textual worker
+        #the purpose is to make the progress bar update while the file is being translated
         segments = process_file_pipeline(self.file_path)
         segment_length = len(segments)
 
