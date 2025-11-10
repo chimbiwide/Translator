@@ -110,11 +110,11 @@ def process_file_pipeline(path:str) -> list:
     text = parse_file(file)
     return text
 
-def translate_pipeline(file:list, model:str, target_lang:str,temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
+def translate_pipeline(file:list, model:str, output_path:str, target_lang:str,temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0, progress_callback=None) -> str:
     """pipeline for translation"""
     text = file
     translated = translate(text, target_lang, model, temp, top_k, top_p, rep_penalty, progress_callback)
-    write_file(translated)
+    write_file(translated, output_path)
 
 if __name__ == "__main__":
     main()
