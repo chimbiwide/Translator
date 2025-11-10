@@ -59,7 +59,7 @@ def unload_model():
 def llmInstance(text:str, target_lang: str, model:str, temp:float=1.0, top_k:int=40, top_p:float=0.9, rep_penalty: float=1.0) -> str:
     """Defines the parameters and translates the given segment"""
     model = lms.llm(model,config={
-        "contextLength": 10240,
+        "contextLength": 20480,
         "gpu": {
             "ratio": 1.0,
         }

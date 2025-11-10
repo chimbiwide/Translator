@@ -12,6 +12,8 @@ class FolderTree(DirectoryTree):
     #folder tree to show the txt files in the directory
     def filter_paths(self, paths: Iterable[Path]) -> Iterable[Path]:
         return [path for path in paths if path.name.endswith(".txt")]
+    def on_mount(self) -> None:
+        self.watch_path()
 
 class Config(HorizontalGroup):
     def compose(self) -> ComposeResult:
@@ -143,6 +145,9 @@ class TUI(App):
 
         progress_bar = self.query_one("#translate_progress", ProgressBar)
         progress_bar.progress = 0
+
+        folder_tree = self.query_one("#target_file", FolderTree)
+        folder_tree.reload()
 
         self.sub_title = "Translation Complete!"
         self.set_timer(5, self.clear_subtitles)
